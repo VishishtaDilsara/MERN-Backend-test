@@ -1,7 +1,8 @@
 import express from "express";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
-import Student from "./models/student.js";
+import studentRouter from "./routes/studentRouter.js";
+import productRouter from "./routes/productRouter.js";
 
 const app = express();
 
@@ -18,40 +19,8 @@ mongoose
     console.log("Database connection failed");
   });
 
-app.get("/", (req, res) => {
-  Student.find().then((data) => {
-    res.json(data);
-  });
-});
-
-app.post("/", (req, res) => {
-  console.log(req.body);
-  //save on students cluster
-
-  const student = new Student({
-    name: req.body.name,
-    age: req.body.age,
-    stream: req.body.stream,
-    email: req.body.email,
-  });
-
-  student
-    .save()
-    .then(() => {
-      res.json({
-        message: "Student added successfully",
-      });
-    })
-    .catch(() => {
-      res.json({
-        message: "Student not added",
-      });
-    });
-});
-
-app.delete("/", () => {
-  console.log("This is a delete request");
-});
+app.use("/students", studentRouter);
+app.use("/products", productRouter);
 
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
