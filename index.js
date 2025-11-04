@@ -1,6 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
+import Student from "./models/student.js";
 
 const app = express();
 
@@ -18,10 +19,34 @@ mongoose
   });
 
 app.get("/", (req, res) => {
-  res.json({
-    message: "This is a get request",
+  Student.find().then((data) => {
+    res.json(data);
   });
-  console.log(req.body.name);
+});
+
+app.post("/", (req, res) => {
+  console.log(req.body);
+  //save on students cluster
+
+  const student = new Student({
+    name: req.body.name,
+    age: req.body.age,
+    stream: req.body.stream,
+    email: req.body.email,
+  });
+
+  student
+    .save()
+    .then(() => {
+      res.json({
+        message: "Student added successfully",
+      });
+    })
+    .catch(() => {
+      res.json({
+        message: "Student not added",
+      });
+    });
 });
 
 app.delete("/", () => {
