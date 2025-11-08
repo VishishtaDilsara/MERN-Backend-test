@@ -9,6 +9,6 @@ const productRouter = exxpress.Router();
 
 productRouter.get("/", getProducts);
 productRouter.post("/", saveProduct);
-productRouter.delete("/", deleteProduct);
+productRouter.delete("/:productId", deleteProduct);
 
 export default productRouter;
