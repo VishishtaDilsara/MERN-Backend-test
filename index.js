@@ -1,7 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
-import studentRouter from "./routes/studentRouter.js";
 import productRouter from "./routes/productRouter.js";
 import userRouter from "./routes/userRouter.js";
 import jwt from "jsonwebtoken";
@@ -38,7 +37,6 @@ mongoose
     console.log("Database connection failed");
   });
 
-app.use("/students", studentRouter);
 app.use("/products", productRouter);
 app.use("/users", userRouter);
 
