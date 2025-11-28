@@ -1,4 +1,5 @@
 import Order from "../models/order.js";
+import Product from "../models/product.js";
 
 export async function createOrder(req, res) {
   //get User Information
@@ -33,18 +34,56 @@ export async function createOrder(req, res) {
     //CBC00552
   }
 
-  //create order object
-  const order = new Order({
-    orderId: orderId,
-    email: req.user.email,
-    name: orderInfo.name,
-    address: orderInfo.address,
-    total: 0,
-    phone: orderInfo.phone,
-    products: [],
-  });
-
   try {
+    let total = 0;
+    let labelledTotal = 0;
+    const products = [];
+
+    for (let i = 0; i < orderInfo.products.length; i++) {
+      const item = await Product.findOne({
+        productId: orderInfo.products[i].productId,
+      });
+      if (item == null) {
+        res.status(404).json({
+          message: `Product with ID ${orderInfo.products[i].productId} not found`,
+        });
+        return;
+      }
+      if (item.isAvailable == false) {
+        res.status(400).json({
+          message: `Product ${item.name} is currently unavailable`,
+        });
+        return;
+      }
+      products[i] = {
+        productInfo: {
+          productId: item.productId,
+          name: item.name,
+          altNames: item.altNames,
+          description: item.description,
+          images: item.images,
+          labelledPrice: item.labelledPrice,
+          price: item.price,
+        },
+        quantity: orderInfo.products[i].qty,
+      };
+
+      total += item.price * orderInfo.products[i].qty;
+      labelledTotal += item.labelledPrice * orderInfo.products[i].qty;
+    }
+
+    //create order object
+    const order = new Order({
+      orderId: orderId,
+      email: req.user.email,
+      name: orderInfo.name,
+      address: orderInfo.address,
+      total: total,
+      labelledTotal: labelledTotal,
+      phone: orderInfo.phone,
+      products: products,
+    });
+
     const createdOrder = await order.save();
     res.json({ message: "Order created successfully", order: createdOrder });
   } catch (err) {
