@@ -6,6 +6,8 @@ import userRouter from "./routes/userRouter.js";
 import jwt from "jsonwebtoken";
 import orderRouter from "./routes/orderRouter.js";
 import cors from "cors";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 
@@ -30,9 +32,7 @@ app.use((req, res, next) => {
 });
 
 mongoose
-  .connect(
-    "mongodb+srv://admin:123@cluster0.svesegc.mongodb.net/?appName=Cluster0"
-  )
+  .connect(process.env.MONGODB_URL)
   .then(() => {
     console.log("Connected to the Database");
   })
@@ -47,5 +47,3 @@ app.use("/api/orders", orderRouter);
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
 });
-
-//mongodb+srv://admin:123@cluster0.svesegc.mongodb.net/?appName=Cluster0
