@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import axios from "axios";
 import nodemailer from "nodemailer";
+import OTP from "../models/otp.js";
 dotenv.config();
 
 export function createUser(req, res) {
@@ -174,6 +175,10 @@ export async function sendOTP(req, res) {
     res.status(404).json({ message: "User not found" });
     return;
   }
+
+  //delete all old OTPs
+  await OTP.deleteMany({ email: email });
+
   const message = {
     from: process.env.GOOGLE_EMAIL,
     to: email,
@@ -236,6 +241,9 @@ export async function sendOTP(req, res) {
     </div>
   `,
   };
+
+  const otp = new OTP({ email: email, otp: randomOTP });
+  await otp.save();
 
   transport.sendMail(message, (error, info) => {
     if (error) {
