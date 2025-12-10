@@ -258,7 +258,8 @@ export async function resetPassword(req, res) {
   const otp = req.body.otp;
   const email = req.body.email;
   const newPassword = req.body.newPassword;
-  const response = OTP.findOne({ email: email });
+
+  const response = await OTP.findOne({ email: email });
   if (response == null) {
     res.status(500).json({ message: "No OTP found. Please try again" });
     return;
