@@ -2,6 +2,7 @@ import User from "../models/user.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import axios from "axios";
 dotenv.config();
 
 export function createUser(req, res) {
@@ -74,6 +75,79 @@ export function loginUser(req, res) {
       }
     }
   });
+}
+
+export async function loginWithGoogle(req, res) {
+  const token = req.body.accessToken;
+  if (token == null) {
+    res.status(403).json({ message: "Access token is required" });
+    return;
+  }
+  const response = await axios.get(
+    "https://www.googleapis.com/oauth2/v3/userinfo",
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  console.log(response.data);
+  const user = await User.findOne({ email: response.data.email });
+  if (user == null) {
+    const fullName = response.data.name || "";
+    const givenName =
+      response.data.given_name || fullName.split(" ")[0] || "User";
+    const familyName =
+      response.data.family_name ||
+      fullName.split(" ").slice(1).join(" ") ||
+      "GoogleUser";
+
+    const newUser = new User({
+      email: response.data.email,
+      firstName: givenName,
+      lastName: familyName,
+      password: "googleUser", // Only used for placeholder; never for login
+      img:
+        response.data.picture ||
+        "https://cdn-icons-png.flaticon.com/512/149/149071.png",
+    });
+
+    await newUser.save();
+
+    const token = jwt.sign(
+      {
+        email: newUser.email,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        role: newUser.role,
+        image: newUser.img,
+      },
+      process.env.JWT_KEY
+    );
+
+    res.json({
+      message: "Login successful",
+      token: token,
+      role: newUser.role,
+    });
+  } else {
+    const token = jwt.sign(
+      {
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        image: user.img,
+      },
+      process.env.JWT_KEY
+    );
+
+    res.json({
+      message: "Login successful",
+      token: token,
+      role: user.role,
+    });
+  }
 }
 
 export function isAdmin(req) {
