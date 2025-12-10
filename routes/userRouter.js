@@ -3,6 +3,7 @@ import {
   createUser,
   loginUser,
   loginWithGoogle,
+  resetPassword,
   sendOTP,
 } from "../controllers/userController.js";
 
@@ -12,5 +13,6 @@ userRouter.post("/", createUser);
 userRouter.post("/login", loginUser);
 userRouter.post("/login/google", loginWithGoogle);
 userRouter.post("/send-otp", sendOTP);
+userRouter.post("/reset-password", resetPassword);
 
 export default userRouter;

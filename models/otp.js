@@ -10,3 +10,6 @@ const OTPSchema = mongoose.Schema({
     required: true,
   },
 });
+
+const OTP = mongoose.model("OTP", OTPSchema);
+export default OTP;

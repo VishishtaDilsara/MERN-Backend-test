@@ -254,6 +254,31 @@ export async function sendOTP(req, res) {
   });
 }
 
+export async function resetPassword(req, res) {
+  const otp = req.body.otp;
+  const email = req.body.email;
+  const newPassword = req.body.newPassword;
+  const response = OTP.findOne({ email: email });
+  if (response == null) {
+    res.status(500).json({ message: "No OTP found. Please try again" });
+    return;
+  }
+  if (otp == response.otp) {
+    await OTP.deleteMany({ email: email });
+    const hashedPassword = bcrypt.hashSync(newPassword, 10);
+    const response2 = await User.updateOne(
+      { email: email },
+      {
+        password: hashedPassword,
+      }
+    );
+    res.json({ message: "Password reset successful" });
+  } else {
+    res.status(403).json({ message: "Invalid OTP. Please try again" });
+    return;
+  }
+}
+
 export function isAdmin(req) {
   if (req.user == null) {
     return false;
