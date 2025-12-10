@@ -169,12 +169,74 @@ export async function sendOTP(req, res) {
     res.status(403).json({ message: "Email is required" });
     return;
   }
+  const user = await User.findOne({ email: email });
+  if (user == null) {
+    res.status(404).json({ message: "User not found" });
+    return;
+  }
   const message = {
     from: process.env.GOOGLE_EMAIL,
     to: email,
-    subject: "Password Reset OTP",
-    text: "This is your password reset OTP : " + randomOTP,
+    subject: "Your OTP Code for Password Reset",
+    html: `
+    <div style="
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      padding: 20px;
+    ">
+      <div style="
+        max-width: 500px;
+        margin: auto;
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      ">
+        <h2 style="text-align: center; color: #0d6efd;">
+          Password Reset Verification
+        </h2>
+
+        <p style="font-size: 15px; color: #333;">
+          Hello,
+        </p>
+
+        <p style="font-size: 15px; color: #333;">
+          We received a request to reset your account password.  
+          Use the OTP code below to complete the verification.
+        </p>
+
+        <div style="
+          text-align: center;
+          margin: 30px 0;
+        ">
+          <span style="
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 6px;
+            color: #0d6efd;
+            padding: 10px 20px;
+            border: 2px dashed #0d6efd;
+            border-radius: 8px;
+            display: inline-block;
+          ">
+            ${randomOTP}
+          </span>
+        </div>
+
+        <p style="font-size: 14px; color: #555;">
+          This OTP will expire in <strong>10 minutes</strong>.  
+          If you did not request a password reset, please ignore this email.
+        </p>
+
+        <p style="font-size: 14px; color: #555;">
+          Best regards,<br>
+          <strong>Your Support Team</strong>
+        </p>
+      </div>
+    </div>
+  `,
   };
+
   transport.sendMail(message, (error, info) => {
     if (error) {
       res.status(500).json({ message: "Error sending OTP", error: error });
