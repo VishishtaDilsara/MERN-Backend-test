@@ -289,6 +289,7 @@ export async function resetPassword(req, res) {
 export function sendMessageByCustomer(req, res) {
   const email = req.body.email;
   const userMessage = req.body.message;
+  const name = req.body.name;
 
   if (!email) {
     return res.status(403).json({ message: "Email is required" });
@@ -315,11 +316,19 @@ export function sendMessageByCustomer(req, res) {
         You received a new message from your website contact form.
       </p>
 
+      <!-- Customer Name -->
+      <div style="background: #e8f7ff; padding: 15px; border-radius: 10px; margin-top: 20px;">
+        <p style="margin: 0; font-size: 14px;"><strong>👤 Customer Name:</strong></p>
+        <p style="margin: 5px 0 0 0; font-size: 16px; color: #333;">${req.body.name}</p>
+      </div>
+
+      <!-- Customer Email -->
       <div style="background: #f2f2ff; padding: 15px; border-radius: 10px; margin-top: 20px;">
         <p style="margin: 0; font-size: 14px;"><strong>📧 Customer Email:</strong></p>
         <p style="margin: 5px 0 0 0; font-size: 16px; color: #333;">${email}</p>
       </div>
 
+      <!-- Message -->
       <div style="margin-top: 20px; background: #f6f6f6; padding: 15px; border-radius: 10px;">
         <p style="margin: 0; font-size: 14px;"><strong>📝 Message:</strong></p>
         <p style="white-space: pre-line; margin-top: 5px; font-size: 15px;">
@@ -333,7 +342,7 @@ export function sendMessageByCustomer(req, res) {
 
     </div>
   </div>
-`,
+  `,
   };
 
   transport.sendMail(mailOptions, (error, info) => {
