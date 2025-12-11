@@ -318,6 +318,19 @@ export async function deleteUser(req, res) {
   }
 }
 
+export async function updateUser(req, res) {
+  if (!isAdmin(req)) {
+    res.status(403).json({ message: "Admin access required to update users" });
+    return;
+  }
+  try {
+    await User.updateOne({ _id: req.params.userId }, req.body);
+    res.json({ message: "Product updated successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating product", error: error });
+  }
+} //TODO: implement update user function
+
 export function isAdmin(req) {
   if (req.user == null) {
     return false;

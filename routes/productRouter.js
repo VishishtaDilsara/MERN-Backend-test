@@ -1,4 +1,4 @@
-import exxpress from "express";
+import express from "express";
 import {
   deleteProduct,
   getProductById,
@@ -8,7 +8,7 @@ import {
   updateProduct,
 } from "../controllers/productController.js";
 
-const productRouter = exxpress.Router();
+const productRouter = express.Router();
 
 productRouter.get("/", getProducts);
 productRouter.post("/", saveProduct);

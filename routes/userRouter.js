@@ -8,6 +8,7 @@ import {
   loginWithGoogle,
   resetPassword,
   sendOTP,
+  updateUser,
 } from "../controllers/userController.js";
 
 const userRouter = express.Router();
@@ -19,6 +20,7 @@ userRouter.post("/send-otp", sendOTP);
 userRouter.post("/reset-password", resetPassword);
 userRouter.get("/all", getAllUsers);
 userRouter.delete("/:userId", deleteUser);
+userRouter.put("/:userId", updateUser);
 userRouter.get("/", getUser);
 
 export default userRouter;
