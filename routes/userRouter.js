@@ -7,6 +7,7 @@ import {
   loginUser,
   loginWithGoogle,
   resetPassword,
+  sendMessageByCustomer,
   sendOTP,
   updateUser,
 } from "../controllers/userController.js";
@@ -18,6 +19,7 @@ userRouter.post("/login", loginUser);
 userRouter.post("/login/google", loginWithGoogle);
 userRouter.post("/send-otp", sendOTP);
 userRouter.post("/reset-password", resetPassword);
+userRouter.post("/send-message", sendMessageByCustomer);
 userRouter.get("/all", getAllUsers);
 userRouter.delete("/:userId", deleteUser);
 userRouter.put("/:userId", updateUser);
