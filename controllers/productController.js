@@ -94,3 +94,19 @@ export async function getProductById(req, res) {
     res.status(500).json({ message: "Error retrieving product", error: err });
   }
 }
+
+export async function searchProducts(req, res) {
+  const searchQuery = req.params.query;
+  try {
+    const products = await Product.find({
+      $or: [
+        { name: { $regex: searchQuery, $options: "i" } },
+        { altNames: { $elemMatch: { $regex: searchQuery, $options: "i" } } },
+      ],
+      isAvailable: true,
+    });
+    res.json(products);
+  } catch (err) {
+    res.status(500).json({ message: "Error searching products", error: err });
+  }
+}

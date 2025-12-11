@@ -24,13 +24,19 @@ export function createUser(req, res) {
     }
   }
   const hashedPassword = bcrypt.hashSync(req.body.password, 10);
-  const user = new User({
+  const userData = new User({
     firstName: req.body.firstName,
     lastName: req.body.lastName,
     email: req.body.email,
     password: hashedPassword,
     role: req.body.role,
   });
+
+  if (req.body.img) {
+    userData.img = req.body.img;
+  }
+
+  const user = new User(userData);
 
   user
     .save()
@@ -277,6 +283,38 @@ export async function resetPassword(req, res) {
   } else {
     res.status(403).json({ message: "Invalid OTP. Please try again" });
     return;
+  }
+}
+
+export function getUser(req, res) {
+  if (req.user == null) {
+    res
+      .status(403)
+      .json({ message: "Unauthorized access. Please Login first." });
+    return;
+  }
+  res.json({ ...req.user });
+}
+
+export async function getAllUsers(req, res) {
+  try {
+    const users = await User.find();
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: "Error retrieving users", error: error });
+  }
+}
+
+export async function deleteUser(req, res) {
+  if (!isAdmin(req)) {
+    res.status(403).json({ message: "Admin access required to delete users" });
+    return;
+  }
+  try {
+    await User.deleteOne({ _id: req.params.userId });
+    res.json({ message: "Product deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting product", error: error });
   }
 }
 
